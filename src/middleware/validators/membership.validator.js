@@ -25,19 +25,33 @@ const registrationSchema = [
         .matches(/^[a-zA-Z' -]+$/).withMessage("Last name can only contain letters (a-z, A-Z), apostrophes ('), hyphens (-), and spaces."),
 
     body('password')
+        .notEmpty().withMessage('Password is required.')
         .isLength({ min: 8, max: 72 }).withMessage('Password must be between 8 and 72 characters.')
+
+];
+
+const loginSchema = [
+
+    body('email')
+        .notEmpty().withMessage('Email is required.')
+        .isEmail().withMessage('Must be a valid email format.')
+        .normalizeEmail(),
+
+    body('password')
+        .notEmpty().withMessage('Password is required.')
 
 ];
 
 const handleValidation = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ status: 400, message: errors.array()[0].msg, data: null });
+        return res.status(400).json({ status: 102, message: errors.array()[0].msg, data: null });
     }
     next();
 };
 
 module.exports = {
     registrationSchema,
+    loginSchema,
     handleValidation
 };
