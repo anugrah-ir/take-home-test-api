@@ -1,13 +1,13 @@
 const db = require('../../config/database');
 const bcrypt = require('bcrypt');
 
-const register = async (email, first_name, last_name, password) => {
-    const findUsers = 'SELECT * FROM users WHERE email = $1';
-    const users = await db.query(findUsers, [email]);
-    if (users.rows.length > 0) {
-        throw { status: 400, message: 'The email is already registered' };
-    }
-    
+const findUserByEmail = async (email) => {
+    const findUserByEmail = 'SELECT * FROM users WHERE email = $1';
+    const users = await db.query(findUserByEmail, [email]);
+    return users.rows.length > 0;
+};
+
+const createUser = async (email, first_name, last_name, password) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -21,5 +21,6 @@ const register = async (email, first_name, last_name, password) => {
 };
 
 module.exports = {
-    register
+    findUserByEmail,
+    createUser
 };
