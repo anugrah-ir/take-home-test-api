@@ -1,25 +1,19 @@
-const { findUserByEmail, createUser } = require('./membership.service')
-const bcrypt = require('bcrypt');
-require('dotenv').config();
-const jwt = require('jsonwebtoken');
+const { createUser, generateToken, getUserData, updateUserName } = require('./membership.service')
 
 const register = async (req, res) => {
     try {
         const { email, first_name, last_name, password } = req.body;
 
-        const isEmailRegistered = await findUserByEmail(email);
-        if (isEmailRegistered) {
-            return res.status(400).json({ status: 102, message: 'The email is already registered', data: null });
-        }
-        
-        const hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALT_ROUNDS) || 10);;
+        await createUser(email, first_name, last_name, password);
 
-        await createUser(email, first_name, last_name, hashedPassword);
         return res.status(200).json({ status: 0, message: 'Register successful.', data: null });
     }
     catch (error) {
-        console.log(error);
-        return res.status(500).json({ status: 500, message: 'Internal server error.', data: null });
+        return res.status(error.code || 500).json({
+            status: error.status || 500,
+            message: error.message ||'Internal server error',
+            data: error.data || null
+        });
     }
 };
 
@@ -27,48 +21,56 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const user = await findUserByEmail(email);
-        if (!user) {
-            return res.status(400).json({ status: 103, message: 'Invalid email or password.', data: null });
-        }
+        const token = await generateToken(email, password);
 
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(400).json({ status: 103, message: 'Invalid email or password.', data: null });
-        }
-
-        const token = jwt.sign({ email: user.email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.TOKEN_EXPIRATION_TIME || '12h' });
         return res.status(200).json({ status: 0, message: 'Login Successful.', data: { token: token } });
     }
     catch (error) {
-        console.log(error);
-        return res.status(500).json({ status: 500, message: 'Internal server error.', data: null });
+        return res.status(error.code || 500).json({
+            status: error.status || 500,
+            message: error.message ||'Internal server error',
+            data: error.data || null
+        });
     }
 };
 
 const getProfile = async (req, res) => {
     try {
         const email = req.user.email;
-        const user = await findUserByEmail(email);
-        if (!user) {
-            return res.status(404).json({ status: 404, message: 'Pengguna tidak ditemukan', data: null });
-        }
 
-        return res.status(200).json({ status: 0, message: 'Sukses', data: {
-            email: user.email,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            profile_image: user.profile_image
-        } });
+        const user = await getUserData(email);
+
+        return res.status(200).json({ status: 0, message: 'Sukses', data: user });
     }
     catch (error) {
-        console.log(error);
-        return res.status(500).json({ status: 500, message: 'Internal server error.', data: null });
+        return res.status(error.code || 500).json({
+            status: error.status || 500,
+            message: error.message ||'Internal server error',
+            data: error.data || null
+        });
+    }
+};
+
+const updateProfile = async (req, res) => {
+    try {
+        const email = req.user.email;
+        const { first_name, last_name } = req.body;
+
+        const user = await updateUserName(email, first_name, last_name);
+        return res.status(200).json({ status: 0, message: 'Update Pofile berhasil', data: user });
+    }
+    catch (error) {
+        return res.status(error.code || 500).json({
+            status: error.status || 500,
+            message: error.message ||'Internal server error',
+            data: error.data || null
+        });
     }
 };
 
 module.exports = {
     register,
     login,
-    getProfile
+    getProfile,
+    updateProfile
 };
