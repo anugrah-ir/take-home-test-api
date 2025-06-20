@@ -46,7 +46,29 @@ const login = async (req, res) => {
     }
 };
 
+const getProfile = async (req, res) => {
+    try {
+        const email = req.user.email;
+        const user = await findUserByEmail(email);
+        if (!user) {
+            return res.status(404).json({ status: 404, message: 'Pengguna tidak ditemukan', data: null });
+        }
+
+        return res.status(200).json({ status: 0, message: 'Sukses', data: {
+            email: user.email,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            profile_image: user.profile_image
+        } });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ status: 500, message: 'Internal server error.', data: null });
+    }
+};
+
 module.exports = {
     register,
-    login
+    login,
+    getProfile
 };
