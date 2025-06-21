@@ -2,7 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
-const membershipRoutes = require('./src/api/membership/membership.routes');
+const membershipRoutes = require('./src/modules/membership/membership.routes');
+const informationRoutes = require('./src/modules/information/information.routes');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use(express.static('public'));
 
 app.use(membershipRoutes);
+app.use(informationRoutes);
 
 app.get('/', (req, res) => {
   res.status(200).send({ message: 'Server is running.' });
