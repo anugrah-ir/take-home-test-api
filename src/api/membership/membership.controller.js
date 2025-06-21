@@ -1,4 +1,4 @@
-const { createUser, generateToken, getUserData, updateUserName } = require('./membership.service')
+const { createUser, generateToken, getUserData, updateUserName, updateUserProfileImage } = require('./membership.service')
 
 const register = async (req, res) => {
     try {
@@ -8,11 +8,11 @@ const register = async (req, res) => {
 
         return res.status(200).json({ status: 0, message: 'Register successful.', data: null });
     }
-    catch (error) {
-        return res.status(error.code || 500).json({
-            status: error.status || 500,
-            message: error.message ||'Internal server error',
-            data: error.data || null
+    catch (err) {
+        return res.status(err.code || 500).json({
+            status: err.status || 500,
+            message: err.message ||'Internal server error',
+            data: err.data || null
         });
     }
 };
@@ -25,11 +25,11 @@ const login = async (req, res) => {
 
         return res.status(200).json({ status: 0, message: 'Login Successful.', data: { token: token } });
     }
-    catch (error) {
-        return res.status(error.code || 500).json({
-            status: error.status || 500,
-            message: error.message ||'Internal server error',
-            data: error.data || null
+    catch (err) {
+        return res.status(err.code || 500).json({
+            status: err.status || 500,
+            message: err.message ||'Internal server error',
+            data: err.data || null
         });
     }
 };
@@ -42,11 +42,11 @@ const getProfile = async (req, res) => {
 
         return res.status(200).json({ status: 0, message: 'Sukses', data: user });
     }
-    catch (error) {
-        return res.status(error.code || 500).json({
-            status: error.status || 500,
-            message: error.message ||'Internal server error',
-            data: error.data || null
+    catch (err) {
+        return res.status(err.code || 500).json({
+            status: err.status || 500,
+            message: err.message ||'Internal server error',
+            data: err.data || null
         });
     }
 };
@@ -59,11 +59,27 @@ const updateProfile = async (req, res) => {
         const user = await updateUserName(email, first_name, last_name);
         return res.status(200).json({ status: 0, message: 'Update Pofile berhasil', data: user });
     }
-    catch (error) {
-        return res.status(error.code || 500).json({
-            status: error.status || 500,
-            message: error.message ||'Internal server error',
-            data: error.data || null
+    catch (err) {
+        return res.status(err.code || 500).json({
+            status: err.status || 500,
+            message: err.message ||'Internal server error',
+            data: err.data || null
+        });
+    }
+};
+
+const updateProfileImage = async (req, res) => {
+    try {
+        const email = req.user.email;
+        const fileName = req.file.filename;
+        const user = await updateUserProfileImage(email, fileName);
+        return res.status(200).json({ status: 0, message: 'Update Profile Image berhasil', data: user });
+    }
+    catch (err) {
+        return res.status(err.code || 500).json({
+            status: err.status || 500,
+            message: err.message ||'Internal server error',
+            data: err.data || null
         });
     }
 };
@@ -72,5 +88,6 @@ module.exports = {
     register,
     login,
     getProfile,
-    updateProfile
+    updateProfile,
+    updateProfileImage
 };

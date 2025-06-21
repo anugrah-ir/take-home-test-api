@@ -12,7 +12,7 @@ const verifyToken = (req, res, next) => {
     }
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-        if (err) return res.status(401).json({ status: 108, message: 'Token diperlukan', data: null });
+        if (err) return res.status(401).json({ status: 108, message: 'Token tidak tidak valid atau kadaluwarsa', data: null });
         req.user = decoded;
         next();
     });
