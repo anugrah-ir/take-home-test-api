@@ -1,4 +1,4 @@
-const { getUserBalance, addUserBalance, recordTransaction } = require('./transaction.service');
+const { getUserBalance, addUserBalance, recordTransaction, getService, subtractUserBalance } = require('./transaction.service');
 
 const getBalance = async (req, res) => {
     try {
@@ -34,7 +34,29 @@ const topup = async (req, res) => {
     }
 };
 
+const transaction = async (req, res) => {
+    try {
+        const service_code = req.body.service_code;
+
+        const service = await getService(service_code);
+
+        const email = req.user.email;
+        await subtractUserBalance(email, service.service_tariff);
+        
+        const transaction = await recordTransaction('PAYMENT', service.service_name, service.service_tariff);
+        return res.status(200).json({ status: 0, message: 'Transaksi berhasil', data: transaction });
+    }
+    catch (err) {
+        return res.status(err.code || 500).json({
+            status: err.status || 500,
+            message: err.message ||'Internal server error',
+            data: err.data || null
+        });
+    }
+};
+
 module.exports = {
     getBalance,
-    topup
+    topup,
+    transaction
 };
