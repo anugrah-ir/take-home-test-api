@@ -110,6 +110,9 @@ const updateUserProfileImage = async (email, fileName) => {
         `;
         const values = [fileUrl, email];
         const user = await db.query(query, values);
+        if (user.rows.length === 0) {
+            throw { code: 404, status: 404, message: 'Pengguna tidak ditemukan' }
+        }
         return user.rows[0];
     }
     catch (err) {

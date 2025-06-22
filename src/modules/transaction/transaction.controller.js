@@ -61,11 +61,7 @@ const getTransactionHistory = async (req, res) => {
         const limit = req.query.limit;
 
         const transactions = await getAllTransactions(email, offset, limit);
-        return res.status(200).json({ status: 0, message: 'Get History Berhasil', data: {
-            offset: offset || 0,
-            limit: limit || transactions.length,
-            records: transactions
-        } });
+        return res.status(200).json({ status: 0, message: 'Get History Berhasil', data: {offset: offset || 0, limit: limit || transactions.length, records: transactions} });
     }
     catch (err) {
         return res.status(err.code || 500).json({
