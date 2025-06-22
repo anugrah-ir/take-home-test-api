@@ -6,7 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "migrate": "psql $DATABASE_URL -f db/schema.sql",
+    "seed": "psql $DATABASE_URL -f db/seed.sql",
+    "setup-db": "npm run migrate && npm run seed"
   },
   "repository": {
     "type": "git",
@@ -28,7 +31,7 @@
     "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.1",
-    "pg": "^8.16.1"
+    "pg": "^8.16.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
