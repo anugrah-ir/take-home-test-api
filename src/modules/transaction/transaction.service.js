@@ -31,7 +31,7 @@ const addUserBalance = async (email, top_up_amount) => {
     }
 };
 
-const recordTransaction = async (transaction_type, description, total_amount) => {
+const recordTransaction = async (email, transaction_type, description, total_amount) => {
     try {
         const now = new Date();
 
@@ -43,11 +43,11 @@ const recordTransaction = async (transaction_type, description, total_amount) =>
         const created_on = now.toISOString();
 
         const query = `
-            INSERT INTO transactions (invoice_number, transaction_type, description, total_amount, created_on)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO transactions (email, invoice_number, transaction_type, description, total_amount, created_on)
+            VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING invoice_number, transaction_type, description, total_amount, created_on
         `;
-        const values = [invoice_number, transaction_type, description, total_amount, created_on];
+        const values = [email, invoice_number, transaction_type, description, total_amount, created_on];
 
         const transaction = await db.query(query, values);
         return transaction.rows[0];
@@ -94,10 +94,32 @@ const subtractUserBalance = async (email, total_amount) => {
     }
 };
 
+const getAllTransactions = async (email, offset, limit) => {
+    try {
+        let query = 'SELECT invoice_number, transaction_type, description, total_amount, created_on FROM transactions WHERE email = $1 ORDER BY created_on DESC';
+        const values = [email];
+        if (offset) {
+            values.push(offset);
+            query += ` OFFSET $${values.length}`;
+        }
+        if (limit) {
+            values.push(limit);
+            query += ` LIMIT $${values.length}`;
+        }
+
+        const transactions = await db.query(query, values);
+        return transactions.rows;
+    }
+    catch (err) {
+        throw err;
+    }
+};
+
 module.exports = {
     getUserBalance,
     addUserBalance,
     recordTransaction,
     getService,
-    subtractUserBalance
+    subtractUserBalance,
+    getAllTransactions
 };
