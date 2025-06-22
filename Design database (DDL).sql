@@ -6,7 +6,7 @@ CREATE TABLE users (
 	password VARCHAR(60) NOT NULL,
 	profile_image TEXT NOT NULL,
 	balance INT NOT NULL DEFAULT 0,
-	CONSTRAINT positive_value CHECK (balance >= 0)
+	CONSTRAINT positive_value CHECK (balance >= 0) -- memastikan nilai balance tidak kurang dari 0
 );
 
 CREATE TABLE banners (
@@ -27,10 +27,10 @@ CREATE TABLE services (
 CREATE TABLE transactions (
 	id SERIAL PRIMARY KEY,
 	email VARCHAR(254) NOT NULL,
-	FOREIGN KEY (email) REFERENCES users(email),
+	FOREIGN KEY (email) REFERENCES users(email), -- foreign key ke tabel user
 	invoice_number VARCHAR(15) UNIQUE NOT NULL,
 	transaction_type VARCHAR(255) NOT NULL,
-	description VARCHAR(255) NOT NULL,	
+	description VARCHAR(255) NOT NULL, -- tidak foreign key karena ada top up yang tidak termasuk di services
 	total_amount INT NOT NULL,
-	created_on VARCHAR(24) NOT NULL
+	created_on VARCHAR(24) NOT NULL -- varchar karena format timestamp di kontrak API tidak ada di PostgreSQL, sehingga di generate lewat JavaScript
 );
