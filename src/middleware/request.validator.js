@@ -7,7 +7,7 @@ app.use(express.json());
 const registrationSchema = [
     body('email')
         .notEmpty().withMessage('Email is required.')
-        .isEmail().withMessage('Must be a valid email format.')
+        .isEmail().withMessage('Paramter email tidak sesuai format')
         .isLength({ max: 254 }).withMessage('Email must not exceed 254 characters.')
         .normalizeEmail(),
     body('first_name')
@@ -28,7 +28,7 @@ const registrationSchema = [
 const loginSchema = [
     body('email')
         .notEmpty().withMessage('Email is required.')
-        .isEmail().withMessage('Must be a valid email format.')
+        .isEmail().withMessage('Paramter email tidak sesuai format')
         .normalizeEmail(),
     body('password')
         .notEmpty().withMessage('Password is required.')

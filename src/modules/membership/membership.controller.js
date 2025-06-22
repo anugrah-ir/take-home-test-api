@@ -6,7 +6,7 @@ const register = async (req, res) => {
 
         await createUser(email, first_name, last_name, password);
 
-        return res.status(200).json({ status: 0, message: 'Register successful.', data: null });
+        return res.status(200).json({ status: 0, message: 'Registrasi berhasil silahkan login', data: null });
     }
     catch (err) {
         return res.status(err.code || 500).json({
@@ -23,9 +23,10 @@ const login = async (req, res) => {
 
         const token = await generateToken(email, password);
 
-        return res.status(200).json({ status: 0, message: 'Login Successful.', data: { token: token } });
+        return res.status(200).json({ status: 0, message: 'Login Sukses', data: { token: token } });
     }
     catch (err) {
+        console.log(err);
         return res.status(err.code || 500).json({
             status: err.status || 500,
             message: err.message ||'Internal server error',

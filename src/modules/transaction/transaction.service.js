@@ -38,7 +38,11 @@ const recordTransaction = async (email, transaction_type, description, total_amo
         const day = String(now.getDate()).padStart(2, '0');
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const year = now.getFullYear();
-        const invoice_number = `INV${day}${month}${year}`;
+
+        const num = Math.floor(Math.random() * 1000);
+        const randomNumber = num.toString().padStart(3, '0');
+        
+        const invoice_number = `INV${day}${month}${year}-${randomNumber}`;
 
         const created_on = now.toISOString();
 

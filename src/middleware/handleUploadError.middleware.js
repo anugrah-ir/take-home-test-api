@@ -1,8 +1,8 @@
 const handleUploadError = (err, req, res, next) => {
-    if (err && err.status === 102) {
-        return res.status(400).json({
-            status: 102,
-            message: err.message,
+    if (err) {
+        return res.status(err.code || 500).json({
+            status: err.status || 500,
+            message: err.message ||'Internal server error',
             data: null
         });
     }

@@ -19,13 +19,14 @@ const getUserByEmail = async (email) => {
 const createUser = async (email, first_name, last_name, password) => {
     try {
         const hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALT_ROUNDS) || 10);
+        const default_profile_image = `${process.env.SERVER_URL}/profile.jpeg`
 
         const query = `
-            INSERT INTO users (email, first_name, last_name, password)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO users (email, first_name, last_name, password, profile_image)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING email, first_name, last_name
         `;
-        const values = [email, first_name, last_name, hashedPassword];
+        const values = [email, first_name, last_name, hashedPassword, default_profile_image];
 
         const user = await db.query(query, values);
         return user.rows[0];
@@ -42,12 +43,12 @@ const generateToken = async (email, password) => {
     try {
         const user = await getUserByEmail(email);
         if (!user) {
-            throw { code: 400, status: 103, message: 'Invalid email or password.' }
+            throw { code: 401, status: 103, message: 'Username atau password salah' }
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            throw { code: 400, status: 103, message: 'Invalid email or password.' }
+            throw { code: 401, status: 103, message: 'Username atau password salah' }
         }
 
         const token = jwt.sign({ email: user.email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.TOKEN_EXPIRATION_TIME || '12h' });
@@ -67,6 +68,7 @@ const getUserData = async (email) => {
 
         delete user.id
         delete user.password;
+        delete user.balance;
         return user;
     }
     catch (err) {

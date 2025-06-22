@@ -8,7 +8,6 @@ const storage = multer.diskStorage({
     filename: function (req, file, cb) {
         const ext = path.extname(file.originalname);
         const baseName = path.basename(file.originalname, ext);
-
         const sanitizedBaseName = baseName.replace(/\s+/g, '-');
 
         cb(null, `${sanitizedBaseName}${ext}`);
@@ -20,6 +19,7 @@ const imageFileFilter = (req, file, cb) => {
         cb(null, true);
     } else {
         cb({
+            code: 400,
             status: 102,
             message: 'Format Image tidak sesuai'
         }, false);
